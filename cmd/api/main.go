@@ -17,6 +17,7 @@ import (
 	dbMongo "github.com/user/gin-microservice-boilerplate/pkg/db/mongo"
 	csvExport "github.com/user/gin-microservice-boilerplate/pkg/export/csv"
 	jpegExport "github.com/user/gin-microservice-boilerplate/pkg/export/jpeg"
+	pdfExport "github.com/user/gin-microservice-boilerplate/pkg/export/pdf"
 	"github.com/user/gin-microservice-boilerplate/pkg/web"
 
 	mongoDriver "go.mongodb.org/mongo-driver/mongo"
@@ -63,6 +64,7 @@ func main() {
 		usecase.NewExportStrategyKey(models.ExportFormatCSV, models.ExportSourceChart):  csvExport.NewChartStrategy(),
 		usecase.NewExportStrategyKey(models.ExportFormatCSV, models.ExportSourceTable):  csvExport.NewTableStrategy(),
 		usecase.NewExportStrategyKey(models.ExportFormatJPEG, models.ExportSourceChart): jpegExport.NewChartStrategy(),
+		usecase.NewExportStrategyKey(models.ExportFormatPDF, models.ExportSourceTable):  pdfExport.NewTableStrategy(),
 	}
 	exportUC := usecase.NewExportUsecase(exportStrategies, nil)
 	exportHandler := handlers.NewExportHandler(exportUC)

@@ -34,6 +34,7 @@ func (h *ExportHandler) RegisterRoutes(rg *gin.RouterGroup) {
 // @Accept       json
 // @Produce      text/csv
 // @Produce      image/jpeg
+// @Produce      application/pdf
 // @Produce      application/json
 // @Param        request  body      models.ExportRequest  true  "Export request"
 // @Success      200      {file}    file
@@ -41,7 +42,7 @@ func (h *ExportHandler) RegisterRoutes(rg *gin.RouterGroup) {
 // @Failure      400      {object}  map[string]string
 // @Failure      501      {object}  map[string]string
 // @Failure      500      {object}  map[string]string
-// @Router       /api/v1/exports [post]
+// @Router       /exports [post]
 func (h *ExportHandler) CreateExport(c *gin.Context) {
 	var req models.ExportRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

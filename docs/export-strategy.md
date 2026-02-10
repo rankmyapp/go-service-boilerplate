@@ -43,8 +43,7 @@
   - `pkg/export/csv`: `csv + chart` strategy.
   - `pkg/export/csv`: `csv + table` strategy.
   - `pkg/export/jpeg`: `jpeg + chart` strategy.
-- Pending:
-  - `pkg/export/pdf`
+  - `pkg/export/pdf`: `pdf + table` strategy.
 
 ## Error Policy
 - `400`: invalid request.
@@ -52,5 +51,4 @@
 - `500`: unexpected internal failures.
 
 ## Next Deliverables
-- MIDEV-6484: PDF strategy for table.
 - MIDEV-6483: unit/integration/golden tests.

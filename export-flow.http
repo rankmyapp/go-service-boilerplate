@@ -102,7 +102,43 @@ Accept: image/jpeg
   }
 }
 
-### 5) Export async - AINDA NAO IMPLEMENTADO (esperado 501)
+### 5) Export PDF (table) - SUCESSO (200 + arquivo PDF)
+POST {{baseUrl}}/exports
+Content-Type: application/json
+Accept: application/pdf
+
+{
+  "format": "pdf",
+  "source_type": "table",
+  "mode": "sync",
+  "file_name": "detailed_historical_anomalies",
+  "payload": {
+    "title": "Detailed historical anomalies",
+    "columns": ["date", "metric", "value", "intensity", "variation_percent", "expected_value", "explanation"],
+    "rows": [
+      [
+        "21/01/2026",
+        "Downloads",
+        "1,560",
+        "High",
+        "+506.6%",
+        "185 - 381",
+        "Valor observado (1560) esta +506.6% acima da media historica (257). O modelo detectou que este valor esta fora do padrao esperado. Excede o limite superior esperado (381) em 1179 unidades. Este valor e maior que 100.0% dos dados historicos."
+      ],
+      [
+        "20/01/2026",
+        "Downloads",
+        "1,964",
+        "High",
+        "+637.8%",
+        "181 - 405",
+        "Valor observado (1964) esta +637.8% acima da media historica (266). O modelo detectou que este valor esta fora do padrao esperado. Excede o limite superior esperado (405) em 1559 unidades. Este valor e maior que 100.0% dos dados historicos."
+      ]
+    ]
+  }
+}
+
+### 6) Export async - AINDA NAO IMPLEMENTADO (esperado 501)
 POST {{baseUrl}}/exports
 Content-Type: application/json
 Accept: application/json
@@ -119,7 +155,7 @@ Accept: application/json
   }
 }
 
-### 6) Payload invalido (series com tamanho diferente de categories) - esperado 500 no estado atual
+### 7) Payload invalido (series com tamanho diferente de categories) - esperado 500 no estado atual
 ### Obs: quando mapearmos erro de dominio para 400 no handler, esse caso deve virar 400.
 POST {{baseUrl}}/exports
 Content-Type: application/json
@@ -137,7 +173,7 @@ Accept: application/json
   }
 }
 
-### 7) Requisicao invalida (sem payload) - esperado 400
+### 8) Requisicao invalida (sem payload) - esperado 400
 POST {{baseUrl}}/exports
 Content-Type: application/json
 Accept: application/json

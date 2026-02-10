@@ -103,7 +103,7 @@ info:
   title: Gin Microservice Boilerplate API
   version: "1.0"
 paths:
-  /api/v1/exports:
+  /exports:
     post:
       consumes:
       - application/json
@@ -119,6 +119,7 @@ paths:
       produces:
       - text/csv
       - image/jpeg
+      - application/pdf
       - application/json
       responses:
         "200":
@@ -150,7 +151,7 @@ paths:
       summary: Request an export
       tags:
       - exports
-  /api/v1/users:
+  /users:
     get:
       description: Get all users
       produces:
@@ -206,7 +207,7 @@ paths:
       summary: Create a new user
       tags:
       - users
-  /api/v1/users/{id}:
+  /users/{id}:
     delete:
       description: Delete a user by ID
       parameters:

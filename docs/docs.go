@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/exports": {
+        "/exports": {
             "post": {
                 "description": "Generates a file synchronously or queues an asynchronous export job",
                 "consumes": [
@@ -24,6 +24,7 @@ const docTemplate = `{
                 "produces": [
                     "text/csv",
                     "image/jpeg",
+                    "application/pdf",
                     "application/json"
                 ],
                 "tags": [
@@ -84,7 +85,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users": {
+        "/users": {
             "get": {
                 "description": "Get all users",
                 "produces": [
@@ -169,7 +170,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/users/{id}": {
+        "/users/{id}": {
             "get": {
                 "description": "Get a single user by their ID",
                 "produces": [

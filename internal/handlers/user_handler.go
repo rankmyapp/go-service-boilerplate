@@ -39,7 +39,7 @@ func (h *UserHandler) RegisterRoutes(rg *gin.RouterGroup) {
 // @Success      201   {object}  map[string]string
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
-// @Router       /api/v1/users [post]
+// @Router       /users [post]
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -63,7 +63,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 // @Produce      json
 // @Success      200  {array}   models.User
 // @Failure      500  {object}  map[string]string
-// @Router       /api/v1/users [get]
+// @Router       /users [get]
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	users, err := h.usecase.GetAllUsers(c.Request.Context())
 	if err != nil {
@@ -83,7 +83,7 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 // @Success      200  {object}  models.User
 // @Failure      404  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
-// @Router       /api/v1/users/{id} [get]
+// @Router       /users/{id} [get]
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -107,7 +107,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Success      200   {object}  map[string]string
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
-// @Router       /api/v1/users/{id} [put]
+// @Router       /users/{id} [put]
 func (h *UserHandler) UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 
@@ -134,7 +134,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 // @Param        id   path      string  true  "User ID"
 // @Success      200  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
-// @Router       /api/v1/users/{id} [delete]
+// @Router       /users/{id} [delete]
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 
