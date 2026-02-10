@@ -60,6 +60,7 @@ func main() {
 
 	exportStrategies := map[usecase.ExportStrategyKey]usecase.ExportStrategy{
 		usecase.NewExportStrategyKey(models.ExportFormatCSV, models.ExportSourceChart): csvExport.NewChartStrategy(),
+		usecase.NewExportStrategyKey(models.ExportFormatCSV, models.ExportSourceTable): csvExport.NewTableStrategy(),
 	}
 	exportUC := usecase.NewExportUsecase(exportStrategies, nil)
 	exportHandler := handlers.NewExportHandler(exportUC)

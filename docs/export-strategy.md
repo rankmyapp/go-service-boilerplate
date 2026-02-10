@@ -41,8 +41,8 @@
 - Unsupported combinations return `ErrUnsupportedExportStrategy`.
 - Implemented:
   - `pkg/export/csv`: `csv + chart` strategy.
+  - `pkg/export/csv`: `csv + table` strategy.
 - Pending:
-  - `pkg/export/csv`: `csv + table`
   - `pkg/export/jpeg`
   - `pkg/export/pdf`
 
@@ -52,7 +52,6 @@
 - `500`: unexpected internal failures.
 
 ## Next Deliverables
-- MIDEV-6332: CSV strategy for table payload.
 - MIDEV-6482: JPEG strategy.
 - MIDEV-6484: PDF strategy for table.
 - MIDEV-6483: unit/integration/golden tests.

@@ -1,9 +1,7 @@
 package csv
 
 import (
-	"bytes"
 	"context"
-	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -54,7 +52,7 @@ func (s *chartStrategy) Generate(ctx context.Context, req models.ExportRequest) 
 	}
 
 	return &models.ExportFile{
-		FileName:    ensureCSVFileName(req.FileName),
+		FileName:    ensureCSVFileName(req.FileName, "chart_export.csv"),
 		ContentType: "text/csv; charset=utf-8",
 		Data:        data,
 	}, nil
@@ -107,19 +105,13 @@ func decodeChartPayload(raw interface{}) (*chartPayload, error) {
 }
 
 func renderChartCSV(ctx context.Context, payload *chartPayload, delimiter rune) ([]byte, error) {
-	var buffer bytes.Buffer
-	writer := csv.NewWriter(&buffer)
-	writer.Comma = delimiter
-	writer.UseCRLF = false
-
+	rows := make([][]string, 0, len(payload.Categories)+1)
 	header := make([]string, 0, len(payload.Series)+1)
 	header = append(header, "category")
 	for _, series := range payload.Series {
 		header = append(header, strings.TrimSpace(series.Name))
 	}
-	if err := writer.Write(header); err != nil {
-		return nil, err
-	}
+	rows = append(rows, header)
 
 	for row := range payload.Categories {
 		if err := ctx.Err(); err != nil {
@@ -133,18 +125,10 @@ func renderChartCSV(ctx context.Context, payload *chartPayload, delimiter rune) 
 			value := strconv.FormatFloat(series.Values[row], 'f', -1, 64)
 			record = append(record, value)
 		}
-
-		if err := writer.Write(record); err != nil {
-			return nil, err
-		}
+		rows = append(rows, record)
 	}
 
-	writer.Flush()
-	if err := writer.Error(); err != nil {
-		return nil, err
-	}
-
-	return buffer.Bytes(), nil
+	return writeCSV(rows, delimiter)
 }
 
 func delimiterRune(delimiter string) (rune, error) {
@@ -159,10 +143,10 @@ func delimiterRune(delimiter string) (rune, error) {
 	return 0, fmt.Errorf("%w: delimiter must have a single character", ErrInvalidChartPayload)
 }
 
-func ensureCSVFileName(fileName string) string {
+func ensureCSVFileName(fileName string, fallback string) string {
 	trimmed := strings.TrimSpace(fileName)
 	if trimmed == "" {
-		return "chart_export.csv"
+		return fallback
 	}
 	if strings.HasSuffix(strings.ToLower(trimmed), ".csv") {
 		return trimmed

@@ -43,15 +43,17 @@ Accept: text/csv
   }
 }
 
-### 3) Export CSV (table) - AINDA NAO IMPLEMENTADO (esperado 501)
+### 3) Export CSV (table) - SUCESSO (200 + arquivo CSV)
 POST {{baseUrl}}/exports
 Content-Type: application/json
-Accept: application/json
+Accept: text/csv
 
 {
   "format": "csv",
   "source_type": "table",
   "mode": "sync",
+  "file_name": "users_table",
+  "delimiter": ",",
   "payload": {
     "columns": ["name", "email"],
     "rows": [
