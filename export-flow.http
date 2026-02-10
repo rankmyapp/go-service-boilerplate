@@ -1,0 +1,108 @@
+@baseUrl = http://localhost:8080/api/v1
+
+### 0) Sanidade: API no ar
+GET {{baseUrl}}/users
+Accept: application/json
+
+### 1) Export CSV (chart) - SUCESSO (200 + arquivo CSV)
+POST {{baseUrl}}/exports
+Content-Type: application/json
+Accept: text/csv
+
+{
+  "format": "csv",
+  "source_type": "chart",
+  "mode": "sync",
+  "file_name": "chart_kpi",
+  "delimiter": ",",
+  "payload": {
+    "categories": ["2026-02-01", "2026-02-02", "2026-02-03"],
+    "series": [
+      { "name": "views", "values": [120, 180, 250] },
+      { "name": "conversion_rate", "values": [1.2, 1.4, 1.6] }
+    ]
+  }
+}
+
+### 2) Export CSV (chart) com delimitador ";" - SUCESSO
+POST {{baseUrl}}/exports
+Content-Type: application/json
+Accept: text/csv
+
+{
+  "format": "csv",
+  "source_type": "chart",
+  "mode": "sync",
+  "file_name": "chart_kpi_semicolon",
+  "delimiter": ";",
+  "payload": {
+    "categories": ["Jan", "Feb"],
+    "series": [
+      { "name": "revenue", "values": [1000, 1500] }
+    ]
+  }
+}
+
+### 3) Export CSV (table) - AINDA NAO IMPLEMENTADO (esperado 501)
+POST {{baseUrl}}/exports
+Content-Type: application/json
+Accept: application/json
+
+{
+  "format": "csv",
+  "source_type": "table",
+  "mode": "sync",
+  "payload": {
+    "columns": ["name", "email"],
+    "rows": [
+      ["Alice", "alice@example.com"],
+      ["Bob", "bob@example.com"]
+    ]
+  }
+}
+
+### 4) Export async - AINDA NAO IMPLEMENTADO (esperado 501)
+POST {{baseUrl}}/exports
+Content-Type: application/json
+Accept: application/json
+
+{
+  "format": "csv",
+  "source_type": "chart",
+  "mode": "async",
+  "payload": {
+    "categories": ["2026-02-01"],
+    "series": [
+      { "name": "views", "values": [100] }
+    ]
+  }
+}
+
+### 5) Payload invalido (series com tamanho diferente de categories) - esperado 500 no estado atual
+### Obs: quando mapearmos erro de dominio para 400 no handler, esse caso deve virar 400.
+POST {{baseUrl}}/exports
+Content-Type: application/json
+Accept: application/json
+
+{
+  "format": "csv",
+  "source_type": "chart",
+  "mode": "sync",
+  "payload": {
+    "categories": ["2026-02-01", "2026-02-02"],
+    "series": [
+      { "name": "views", "values": [100] }
+    ]
+  }
+}
+
+### 6) Requisicao invalida (sem payload) - esperado 400
+POST {{baseUrl}}/exports
+Content-Type: application/json
+Accept: application/json
+
+{
+  "format": "csv",
+  "source_type": "chart",
+  "mode": "sync"
+}

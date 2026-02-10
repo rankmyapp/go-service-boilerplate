@@ -1,9 +1,6 @@
 package models
 
-import (
-	"encoding/json"
-	"time"
-)
+import "time"
 
 type ExportFormat string
 
@@ -44,7 +41,7 @@ type ExportRequest struct {
 	Locale     string           `json:"locale,omitempty"`
 	Timezone   string           `json:"timezone,omitempty"`
 	Delimiter  string           `json:"delimiter,omitempty"`
-	Payload    json.RawMessage  `json:"payload" binding:"required"`
+	Payload    interface{}      `json:"payload" binding:"required" swaggertype:"object"`
 }
 
 type ExportFile struct {

@@ -12,8 +12,10 @@ import (
 	"github.com/user/gin-microservice-boilerplate/internal/handlers"
 	repoMongo "github.com/user/gin-microservice-boilerplate/internal/repository/mongo"
 	"github.com/user/gin-microservice-boilerplate/internal/usecase"
+	"github.com/user/gin-microservice-boilerplate/models"
 	"github.com/user/gin-microservice-boilerplate/pkg/db"
 	dbMongo "github.com/user/gin-microservice-boilerplate/pkg/db/mongo"
+	csvExport "github.com/user/gin-microservice-boilerplate/pkg/export/csv"
 	"github.com/user/gin-microservice-boilerplate/pkg/web"
 
 	mongoDriver "go.mongodb.org/mongo-driver/mongo"
@@ -55,7 +57,11 @@ func main() {
 	userRepo := repoMongo.NewUserRepo(primaryDB)
 	userUC := usecase.NewUserUsecase(userRepo)
 	userHandler := handlers.NewUserHandler(userUC)
-	exportUC := usecase.NewExportUsecase(nil, nil)
+
+	exportStrategies := map[usecase.ExportStrategyKey]usecase.ExportStrategy{
+		usecase.NewExportStrategyKey(models.ExportFormatCSV, models.ExportSourceChart): csvExport.NewChartStrategy(),
+	}
+	exportUC := usecase.NewExportUsecase(exportStrategies, nil)
 	exportHandler := handlers.NewExportHandler(exportUC)
 
 	router := web.NewRouter()

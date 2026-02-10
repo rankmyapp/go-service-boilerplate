@@ -39,8 +39,10 @@
 ## Strategy Registry
 - Usecase stores strategies in map key `(format, source_type)`.
 - Unsupported combinations return `ErrUnsupportedExportStrategy`.
-- Next tasks will register concrete implementations:
-  - `pkg/export/csv`
+- Implemented:
+  - `pkg/export/csv`: `csv + chart` strategy.
+- Pending:
+  - `pkg/export/csv`: `csv + table`
   - `pkg/export/jpeg`
   - `pkg/export/pdf`
 
@@ -50,7 +52,6 @@
 - `500`: unexpected internal failures.
 
 ## Next Deliverables
-- MIDEV-6330: CSV strategy for chart payload.
 - MIDEV-6332: CSV strategy for table payload.
 - MIDEV-6482: JPEG strategy.
 - MIDEV-6484: PDF strategy for table.

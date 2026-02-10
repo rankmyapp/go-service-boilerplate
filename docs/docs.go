@@ -15,6 +15,74 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/exports": {
+            "post": {
+                "description": "Generates a file synchronously or queues an asynchronous export job",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/csv",
+                    "application/json"
+                ],
+                "tags": [
+                    "exports"
+                ],
+                "summary": "Request an export",
+                "parameters": [
+                    {
+                        "description": "Export request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ExportRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/models.ExportResult"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/users": {
             "get": {
                 "description": "Get all users",
@@ -248,6 +316,129 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.ExportFormat": {
+            "type": "string",
+            "enum": [
+                "csv",
+                "jpeg",
+                "pdf"
+            ],
+            "x-enum-varnames": [
+                "ExportFormatCSV",
+                "ExportFormatJPEG",
+                "ExportFormatPDF"
+            ]
+        },
+        "models.ExportJobStatus": {
+            "type": "string",
+            "enum": [
+                "queued",
+                "processing",
+                "completed",
+                "failed"
+            ],
+            "x-enum-varnames": [
+                "ExportJobStatusQueued",
+                "ExportJobStatusProcessing",
+                "ExportJobStatusCompleted",
+                "ExportJobStatusFailed"
+            ]
+        },
+        "models.ExportMode": {
+            "type": "string",
+            "enum": [
+                "sync",
+                "async"
+            ],
+            "x-enum-varnames": [
+                "ExportModeSync",
+                "ExportModeAsync"
+            ]
+        },
+        "models.ExportRequest": {
+            "type": "object",
+            "required": [
+                "format",
+                "payload",
+                "source_type"
+            ],
+            "properties": {
+                "delimiter": {
+                    "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "format": {
+                    "enum": [
+                        "csv",
+                        "jpeg",
+                        "pdf"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ExportFormat"
+                        }
+                    ]
+                },
+                "locale": {
+                    "type": "string"
+                },
+                "mode": {
+                    "enum": [
+                        "sync",
+                        "async"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ExportMode"
+                        }
+                    ]
+                },
+                "payload": {
+                    "type": "object"
+                },
+                "source_type": {
+                    "enum": [
+                        "chart",
+                        "table"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ExportSourceType"
+                        }
+                    ]
+                },
+                "timezone": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ExportResult": {
+            "type": "object",
+            "properties": {
+                "job_id": {
+                    "type": "string"
+                },
+                "mode": {
+                    "$ref": "#/definitions/models.ExportMode"
+                },
+                "status": {
+                    "$ref": "#/definitions/models.ExportJobStatus"
+                }
+            }
+        },
+        "models.ExportSourceType": {
+            "type": "string",
+            "enum": [
+                "chart",
+                "table"
+            ],
+            "x-enum-varnames": [
+                "ExportSourceChart",
+                "ExportSourceTable"
+            ]
+        },
         "models.User": {
             "type": "object",
             "properties": {

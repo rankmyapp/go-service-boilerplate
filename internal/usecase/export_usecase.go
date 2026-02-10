@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	ErrInvalidExportRequest     = errors.New("invalid export request")
+	ErrInvalidExportRequest      = errors.New("invalid export request")
 	ErrUnsupportedExportStrategy = errors.New("unsupported export strategy")
-	ErrAsyncModeNotImplemented  = errors.New("async export mode not implemented")
+	ErrAsyncModeNotImplemented   = errors.New("async export mode not implemented")
 )
 
 type ExportStrategy interface {
@@ -126,7 +126,7 @@ func normalizeExportRequest(req models.ExportRequest) models.ExportRequest {
 }
 
 func validateExportRequest(req models.ExportRequest) error {
-	if len(req.Payload) == 0 {
+	if req.Payload == nil {
 		return errors.New("payload is required")
 	}
 

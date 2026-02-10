@@ -32,9 +32,10 @@ func (h *ExportHandler) RegisterRoutes(rg *gin.RouterGroup) {
 // @Description  Generates a file synchronously or queues an asynchronous export job
 // @Tags         exports
 // @Accept       json
+// @Produce      text/csv
 // @Produce      application/json
 // @Param        request  body      models.ExportRequest  true  "Export request"
-// @Success      200      {string}  string
+// @Success      200      {file}    file
 // @Success      202      {object}  models.ExportResult
 // @Failure      400      {object}  map[string]string
 // @Failure      501      {object}  map[string]string
