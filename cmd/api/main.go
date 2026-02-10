@@ -55,10 +55,13 @@ func main() {
 	userRepo := repoMongo.NewUserRepo(primaryDB)
 	userUC := usecase.NewUserUsecase(userRepo)
 	userHandler := handlers.NewUserHandler(userUC)
+	exportUC := usecase.NewExportUsecase(nil, nil)
+	exportHandler := handlers.NewExportHandler(exportUC)
 
 	router := web.NewRouter()
 	api := router.Group("/api/v1")
 	userHandler.RegisterRoutes(api)
+	exportHandler.RegisterRoutes(api)
 
 	go func() {
 		if err := web.Start(router, cfg.Server.Port); err != nil {
