@@ -33,6 +33,7 @@ func (h *ExportHandler) RegisterRoutes(rg *gin.RouterGroup) {
 // @Tags         exports
 // @Accept       json
 // @Produce      text/csv
+// @Produce      image/jpeg
 // @Produce      application/json
 // @Param        request  body      models.ExportRequest  true  "Export request"
 // @Success      200      {file}    file

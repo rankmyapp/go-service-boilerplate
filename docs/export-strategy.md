@@ -42,8 +42,8 @@
 - Implemented:
   - `pkg/export/csv`: `csv + chart` strategy.
   - `pkg/export/csv`: `csv + table` strategy.
+  - `pkg/export/jpeg`: `jpeg + chart` strategy.
 - Pending:
-  - `pkg/export/jpeg`
   - `pkg/export/pdf`
 
 ## Error Policy
@@ -52,6 +52,5 @@
 - `500`: unexpected internal failures.
 
 ## Next Deliverables
-- MIDEV-6482: JPEG strategy.
 - MIDEV-6484: PDF strategy for table.
 - MIDEV-6483: unit/integration/golden tests.

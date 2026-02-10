@@ -23,6 +23,7 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "text/csv",
+                    "image/jpeg",
                     "application/json"
                 ],
                 "tags": [

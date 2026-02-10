@@ -43,7 +43,7 @@ Accept: text/csv
   }
 }
 
-### 3) Export CSV (table) - SUCESSO (200 + arquivo CSV)
+### 3) Export CSV (table) - SUCESSO (mock de anomalias historicas)
 POST {{baseUrl}}/exports
 Content-Type: application/json
 Accept: text/csv
@@ -52,18 +52,57 @@ Accept: text/csv
   "format": "csv",
   "source_type": "table",
   "mode": "sync",
-  "file_name": "users_table",
+  "file_name": "detailed_historical_anomalies",
   "delimiter": ",",
   "payload": {
-    "columns": ["name", "email"],
+    "columns": ["date", "metric", "value", "intensity", "variation_percent", "expected_value", "explanation"],
     "rows": [
-      ["Alice", "alice@example.com"],
-      ["Bob", "bob@example.com"]
+      [
+        "21/01/2026",
+        "Downloads",
+        "1,560",
+        "High",
+        "+506.6%",
+        "185 - 381",
+        "Valor observado (1560) esta +506.6% acima da media historica (257). O modelo detectou que este valor esta fora do padrao esperado. Excede o limite superior esperado (381) em 1179 unidades. Este valor e maior que 100.0% dos dados historicos."
+      ],
+      [
+        "20/01/2026",
+        "Downloads",
+        "1,964",
+        "High",
+        "+637.8%",
+        "181 - 405",
+        "Valor observado (1964) esta +637.8% acima da media historica (266). O modelo detectou que este valor esta fora do padrao esperado. Excede o limite superior esperado (405) em 1559 unidades. Este valor e maior que 100.0% dos dados historicos."
+      ]
     ]
   }
 }
 
-### 4) Export async - AINDA NAO IMPLEMENTADO (esperado 501)
+### 4) Export JPEG (chart) - SUCESSO (mock real derivado da tabela de anomalias)
+POST {{baseUrl}}/exports
+Content-Type: application/json
+Accept: image/jpeg
+
+{
+  "format": "jpeg",
+  "source_type": "chart",
+  "mode": "sync",
+  "file_name": "detailed_historical_anomalies_chart",
+  "payload": {
+    "width": 1280,
+    "height": 720,
+    "quality": 90,
+    "categories": ["15/01/2026", "16/01/2026", "17/01/2026", "18/01/2026", "19/01/2026", "20/01/2026", "21/01/2026"],
+    "series": [
+      { "name": "observed_downloads", "values": [320, 230, 230, 230, 360, 1964, 1560] },
+      { "name": "expected_min", "values": [180, 175, 170, 160, 180, 181, 185] },
+      { "name": "expected_max", "values": [380, 370, 340, 300, 410, 405, 381] }
+    ]
+  }
+}
+
+### 5) Export async - AINDA NAO IMPLEMENTADO (esperado 501)
 POST {{baseUrl}}/exports
 Content-Type: application/json
 Accept: application/json
@@ -80,7 +119,7 @@ Accept: application/json
   }
 }
 
-### 5) Payload invalido (series com tamanho diferente de categories) - esperado 500 no estado atual
+### 6) Payload invalido (series com tamanho diferente de categories) - esperado 500 no estado atual
 ### Obs: quando mapearmos erro de dominio para 400 no handler, esse caso deve virar 400.
 POST {{baseUrl}}/exports
 Content-Type: application/json
@@ -98,7 +137,7 @@ Accept: application/json
   }
 }
 
-### 6) Requisicao invalida (sem payload) - esperado 400
+### 7) Requisicao invalida (sem payload) - esperado 400
 POST {{baseUrl}}/exports
 Content-Type: application/json
 Accept: application/json

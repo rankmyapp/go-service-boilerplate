@@ -118,6 +118,7 @@ paths:
           $ref: '#/definitions/models.ExportRequest'
       produces:
       - text/csv
+      - image/jpeg
       - application/json
       responses:
         "200":
