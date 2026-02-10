@@ -1,0 +1,176 @@
+basePath: /api/v1
+definitions:
+  models.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: A clean architecture boilerplate with Gin and MongoDB
+  title: Gin Microservice Boilerplate API
+  version: "1.0"
+paths:
+  /api/v1/users:
+    get:
+      description: Get all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.User'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: List all users
+      tags:
+      - users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with name and email
+      parameters:
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new user
+      tags:
+      - users
+  /api/v1/users/{id}:
+    delete:
+      description: Delete a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      description: Get a single user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update user data by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a user
+      tags:
+      - users
+swagger: "2.0"

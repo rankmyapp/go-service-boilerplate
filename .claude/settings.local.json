@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(go mod init:*)",
+      "Bash(go mod tidy:*)",
+      "Bash(go install:*)",
+      "Bash(swag init:*)",
+      "Bash(~/go/bin/swag init:*)",
+      "Bash(go build:*)",
+      "Bash(go list:*)",
+      "Bash(go get:*)",
+      "Bash(go test:*)"
+    ]
+  }
+}
