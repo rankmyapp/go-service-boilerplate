@@ -1,5 +1,88 @@
 basePath: /api/v1
 definitions:
+  models.ExportFormat:
+    enum:
+    - csv
+    - jpeg
+    - pdf
+    type: string
+    x-enum-varnames:
+    - ExportFormatCSV
+    - ExportFormatJPEG
+    - ExportFormatPDF
+  models.ExportJobStatus:
+    enum:
+    - queued
+    - processing
+    - completed
+    - failed
+    type: string
+    x-enum-varnames:
+    - ExportJobStatusQueued
+    - ExportJobStatusProcessing
+    - ExportJobStatusCompleted
+    - ExportJobStatusFailed
+  models.ExportMode:
+    enum:
+    - sync
+    - async
+    type: string
+    x-enum-varnames:
+    - ExportModeSync
+    - ExportModeAsync
+  models.ExportRequest:
+    properties:
+      delimiter:
+        type: string
+      file_name:
+        type: string
+      format:
+        allOf:
+        - $ref: '#/definitions/models.ExportFormat'
+        enum:
+        - csv
+        - jpeg
+        - pdf
+      locale:
+        type: string
+      mode:
+        allOf:
+        - $ref: '#/definitions/models.ExportMode'
+        enum:
+        - sync
+        - async
+      payload:
+        type: object
+      source_type:
+        allOf:
+        - $ref: '#/definitions/models.ExportSourceType'
+        enum:
+        - chart
+        - table
+      timezone:
+        type: string
+    required:
+    - format
+    - payload
+    - source_type
+    type: object
+  models.ExportResult:
+    properties:
+      job_id:
+        type: string
+      mode:
+        $ref: '#/definitions/models.ExportMode'
+      status:
+        $ref: '#/definitions/models.ExportJobStatus'
+    type: object
+  models.ExportSourceType:
+    enum:
+    - chart
+    - table
+    type: string
+    x-enum-varnames:
+    - ExportSourceChart
+    - ExportSourceTable
   models.User:
     properties:
       created_at:
@@ -20,7 +103,55 @@ info:
   title: Gin Microservice Boilerplate API
   version: "1.0"
 paths:
-  /api/v1/users:
+  /exports:
+    post:
+      consumes:
+      - application/json
+      description: Generates a file synchronously or queues an asynchronous export
+        job
+      parameters:
+      - description: Export request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ExportRequest'
+      produces:
+      - text/csv
+      - image/jpeg
+      - application/pdf
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/models.ExportResult'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "501":
+          description: Not Implemented
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Request an export
+      tags:
+      - exports
+  /users:
     get:
       description: Get all users
       produces:
@@ -76,7 +207,7 @@ paths:
       summary: Create a new user
       tags:
       - users
-  /api/v1/users/{id}:
+  /users/{id}:
     delete:
       description: Delete a user by ID
       parameters:
