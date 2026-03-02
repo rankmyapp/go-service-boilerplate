@@ -2,10 +2,14 @@ package main
 
 import (
 	"context"
-	"log"
+	"errors"
+	"fmt"
+	"log/slog"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/user/gin-microservice-boilerplate/config"
 	_ "github.com/user/gin-microservice-boilerplate/docs"
@@ -18,6 +22,7 @@ import (
 	csvExport "github.com/user/gin-microservice-boilerplate/pkg/export/csv"
 	jpegExport "github.com/user/gin-microservice-boilerplate/pkg/export/jpeg"
 	pdfExport "github.com/user/gin-microservice-boilerplate/pkg/export/pdf"
+	"github.com/user/gin-microservice-boilerplate/pkg/logging"
 	"github.com/user/gin-microservice-boilerplate/pkg/web"
 
 	mongoDriver "go.mongodb.org/mongo-driver/mongo"
@@ -31,10 +36,23 @@ import (
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
+		slog.Error("failed to load config", "error", err)
+		os.Exit(1)
 	}
 
-	ctx := context.Background()
+	logger, err := logging.New(logging.Config{
+		Level:     cfg.Log.Level,
+		Format:    cfg.Log.Format,
+		AddSource: cfg.Log.AddSource,
+	})
+	if err != nil {
+		slog.Error("failed to initialize logger", "error", err)
+		os.Exit(1)
+	}
+	slog.SetDefault(logger)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
 	mgr := db.NewConnectionManager()
 	mgr.RegisterProvider("mongodb", dbMongo.Registration())
@@ -45,16 +63,23 @@ func main() {
 			"database": dbCfg.Database,
 		}
 		if err := mgr.Connect(ctx, name, dbCfg.Kind, params); err != nil {
-			log.Fatalf("failed to connect database %q: %v", name, err)
+			logger.Error("failed to connect database", "name", name, "error", err)
+			os.Exit(1)
 		}
 	}
-	defer mgr.CloseAll(ctx)
+	defer func() {
+		closeCtx, closeCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer closeCancel()
+		if err := mgr.CloseAll(closeCtx); err != nil {
+			logger.Error("failed to close database connections", "error", err)
+		}
+	}()
 
-	primaryConn, err := mgr.Get("primary")
+	primaryDB, err := db.GetTyped[*mongoDriver.Database](mgr, "primary")
 	if err != nil {
-		log.Fatalf("primary database not configured: %v", err)
+		logger.Error("primary database not configured", "error", err)
+		os.Exit(1)
 	}
-	primaryDB := primaryConn.(*mongoDriver.Database)
 
 	userRepo := repoMongo.NewUserRepo(primaryDB)
 	userUC := usecase.NewUserUsecase(userRepo)
@@ -69,19 +94,31 @@ func main() {
 	exportUC := usecase.NewExportUsecase(exportStrategies, nil)
 	exportHandler := handlers.NewExportHandler(exportUC)
 
-	router := web.NewRouter()
+	router := web.NewRouterWithLogger(logger, cfg.Server.CORSAllowedOrigins)
 	api := router.Group("/api/v1")
 	userHandler.RegisterRoutes(api)
 	exportHandler.RegisterRoutes(api)
 
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.Server.Port),
+		Handler: router,
+	}
+
 	go func() {
-		if err := web.Start(router, cfg.Server.Port); err != nil {
-			log.Fatalf("server error: %v", err)
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			logger.Error("server error", "error", err)
+			os.Exit(1)
 		}
 	}()
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
-	log.Println("shutting down...")
+	logger.Info("shutting down - waiting for active requests")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		logger.Error("forced shutdown", "error", err)
+	}
 }

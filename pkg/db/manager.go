@@ -98,3 +98,17 @@ func (m *ConnectionManager) CloseAll(ctx context.Context) error {
 	}
 	return nil
 }
+
+func GetTyped[T any](m *ConnectionManager, name string) (T, error) {
+	conn, err := m.Get(name)
+	if err != nil {
+		var zero T
+		return zero, err
+	}
+	typed, ok := conn.(T)
+	if !ok {
+		var zero T
+		return zero, fmt.Errorf("connection %q has unexpected type", name)
+	}
+	return typed, nil
+}
