@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/user/gin-microservice-boilerplate/internal/middleware"
 	"github.com/user/gin-microservice-boilerplate/internal/usecase"
 	"github.com/user/gin-microservice-boilerplate/models"
 )
@@ -18,14 +19,14 @@ func NewUserHandler(uc usecase.UserUsecase) *UserHandler {
 }
 
 // RegisterRoutes attaches user routes to the given router group.
-func (h *UserHandler) RegisterRoutes(rg *gin.RouterGroup) {
+func (h *UserHandler) RegisterRoutes(rg *gin.RouterGroup, perms UserRoutePermissions) {
 	users := rg.Group("/users")
 	{
-		users.POST("", h.CreateUser)
-		users.GET("", h.GetAllUsers)
-		users.GET("/:id", h.GetUserByID)
-		users.PUT("/:id", h.UpdateUser)
-		users.DELETE("/:id", h.DeleteUser)
+		users.POST("", middleware.RequirePermissions(perms.Create...), h.CreateUser)
+		users.GET("", middleware.RequirePermissions(perms.List...), h.GetAllUsers)
+		users.GET("/:id", middleware.RequirePermissions(perms.Get...), h.GetUserByID)
+		users.PUT("/:id", middleware.RequirePermissions(perms.Update...), h.UpdateUser)
+		users.DELETE("/:id", middleware.RequirePermissions(perms.Delete...), h.DeleteUser)
 	}
 }
 
@@ -36,6 +37,7 @@ func (h *UserHandler) RegisterRoutes(rg *gin.RouterGroup) {
 // @Accept       json
 // @Produce      json
 // @Param        user  body      models.User  true  "User object"
+// @Security     BearerAuth
 // @Success      201   {object}  map[string]string
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
@@ -61,6 +63,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 // @Description  Get all users
 // @Tags         users
 // @Produce      json
+// @Security     BearerAuth
 // @Success      200  {array}   models.User
 // @Failure      500  {object}  map[string]string
 // @Router       /users [get]
@@ -80,6 +83,7 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 // @Tags         users
 // @Produce      json
 // @Param        id   path      string  true  "User ID"
+// @Security     BearerAuth
 // @Success      200  {object}  models.User
 // @Failure      404  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
@@ -104,6 +108,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Produce      json
 // @Param        id    path      string       true  "User ID"
 // @Param        user  body      models.User  true  "User object"
+// @Security     BearerAuth
 // @Success      200   {object}  map[string]string
 // @Failure      400   {object}  map[string]string
 // @Failure      500   {object}  map[string]string
@@ -132,6 +137,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 // @Tags         users
 // @Produce      json
 // @Param        id   path      string  true  "User ID"
+// @Security     BearerAuth
 // @Success      200  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
 // @Router       /users/{id} [delete]

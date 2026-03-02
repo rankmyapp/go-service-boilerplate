@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/user/gin-microservice-boilerplate/internal/middleware"
 	"github.com/user/gin-microservice-boilerplate/internal/usecase"
 	"github.com/user/gin-microservice-boilerplate/models"
 )
@@ -20,10 +21,10 @@ func NewExportHandler(uc usecase.ExportUsecase) *ExportHandler {
 }
 
 // RegisterRoutes attaches export routes to the given router group.
-func (h *ExportHandler) RegisterRoutes(rg *gin.RouterGroup) {
+func (h *ExportHandler) RegisterRoutes(rg *gin.RouterGroup, perms ExportRoutePermissions) {
 	exports := rg.Group("/exports")
 	{
-		exports.POST("", h.CreateExport)
+		exports.POST("", middleware.RequirePermissions(perms.Create...), h.CreateExport)
 	}
 }
 
@@ -37,6 +38,7 @@ func (h *ExportHandler) RegisterRoutes(rg *gin.RouterGroup) {
 // @Produce      application/pdf
 // @Produce      application/json
 // @Param        request  body      models.ExportRequest  true  "Export request"
+// @Security     BearerAuth
 // @Success      200      {file}    file
 // @Success      202      {object}  models.ExportResult
 // @Failure      400      {object}  map[string]string

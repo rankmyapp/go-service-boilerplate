@@ -33,7 +33,7 @@ func setupExportRouter(handler *ExportHandler) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
 	api := r.Group("/api/v1")
-	handler.RegisterRoutes(api)
+	handler.RegisterRoutes(api, ExportRoutePermissions{})
 	return r
 }
 
