@@ -11,6 +11,11 @@
     "paths": {
         "/exports": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Generates a file synchronously or queues an asynchronous export job",
                 "consumes": [
                     "application/json"
@@ -81,6 +86,11 @@
         },
         "/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get all users",
                 "produces": [
                     "application/json"
@@ -111,6 +121,11 @@
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new user with name and email",
                 "consumes": [
                     "application/json"
@@ -166,6 +181,11 @@
         },
         "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a single user by their ID",
                 "produces": [
                     "application/json"
@@ -211,6 +231,11 @@
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Update user data by ID",
                 "consumes": [
                     "application/json"
@@ -271,6 +296,11 @@
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a user by ID",
                 "produces": [
                     "application/json"
@@ -454,6 +484,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

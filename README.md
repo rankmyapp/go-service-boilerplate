@@ -76,11 +76,52 @@ A aplicacao usa variaveis de ambiente carregadas via `.env`. O arquivo `.env.exa
 | `DB_PRIMARY_URI`      | `mongodb://localhost:27017`   | URI de conexao       |
 | `DB_PRIMARY_DATABASE` | `appdb`                       | Nome do database     |
 
+### Auth & Permissoes (JWT)
+
+O template suporta autenticacao via JWT (HS256) e autorizacao por IDs numericos no claim `permissions`.
+
+- `AUTH_ENABLED=false` (default): endpoints em `/api/v1` ficam publicos.
+- `AUTH_ENABLED=true`: endpoints em `/api/v1` exigem token via `Authorization: Bearer <token>` (e opcionalmente via cookie HttpOnly).
+
+| Variavel                         | Default                          | Descricao |
+|----------------------------------|----------------------------------|-----------|
+| `AUTH_ENABLED`                   | `false`                          | Ativa/desativa autenticacao/autorizacao |
+| `JWT_SECRET`                     | -                                | Secret HS256 (obrigatorio quando `AUTH_ENABLED=true`) |
+| `API_SECRET`                     | -                                | Alternativa ao `JWT_SECRET` |
+| `AUTH_TOKEN_COOKIE_NAME`         | `authService_production_token`   | Nome do cookie HttpOnly (use vazio para desabilitar) |
+| `AUTH_REQUIRED_PERMISSIONS`      | vazio                            | Fallback global (CSV de IDs) |
+| `AUTH_PERMISSIONS_USERS_CREATE`  | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
+| `AUTH_PERMISSIONS_USERS_LIST`    | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
+| `AUTH_PERMISSIONS_USERS_GET`     | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
+| `AUTH_PERMISSIONS_USERS_UPDATE`  | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
+| `AUTH_PERMISSIONS_USERS_DELETE`  | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
+| `AUTH_PERMISSIONS_EXPORTS_CREATE`| `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
+
+Se a env especifica estiver vazia, sera usado `AUTH_REQUIRED_PERMISSIONS`.
+
+Exemplo:
+
+```env
+AUTH_ENABLED=true
+JWT_SECRET=ranksecret
+AUTH_REQUIRED_PERMISSIONS=339
+AUTH_PERMISSIONS_USERS_CREATE=339
+AUTH_PERMISSIONS_EXPORTS_CREATE=339
+```
+
+Requisicao:
+
+```bash
+curl -H "Authorization: Bearer <token>" http://localhost:8080/api/v1/users
+```
+
 O `.env` esta no `.gitignore` para nao expor credenciais. Sempre commite apenas o `.env.example`.
 
 ---
 
 ## Endpoints da API
+
+Quando `AUTH_ENABLED=true`, todos os endpoints em `/api/v1` exigem JWT e podem retornar **401** se token/permissoes forem invalidos.
 
 | Metodo   | Rota                  | Descricao         |
 |----------|-----------------------|--------------------|
