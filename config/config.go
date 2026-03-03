@@ -27,23 +27,43 @@ type LogConfig struct {
 	AddSource bool
 }
 
-type AuthConfig struct {
-	Enabled     bool
-	JWTSecret   string
-	JWTIssuer   string
-	JWTAudience string
-}
-
 type DatabaseConfig struct {
 	Kind     string
 	URI      string
 	Database string
 }
 
+type AuthConfig struct {
+	Enabled         bool
+	JWTSecret       string
+	JWTIssuer       string
+	JWTAudience     string
+	TokenCookieName string
+	Permissions     AuthPermissionsConfig
+}
+
+type AuthPermissionsConfig struct {
+	Default []int
+	Users   UserPermissionsConfig
+	Exports ExportPermissionsConfig
+}
+
+type UserPermissionsConfig struct {
+	Create []int
+	List   []int
+	Get    []int
+	Update []int
+	Delete []int
+}
+
+type ExportPermissionsConfig struct {
+	Create []int
+}
+
 func Load() (*Config, error) {
 	_ = godotenv.Load()
 
-	port, err := strconv.Atoi(getEnv("SERVER_PORT", "8080"))
+	port, err := strconv.Atoi(getEnv([]string{"SERVER_PORT", "PORT"}, "8080"))
 	if err != nil {
 		return nil, fmt.Errorf("invalid SERVER_PORT: %w", err)
 	}
@@ -114,9 +134,18 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
-func getEnv(key, fallback string) string {
-	if val := os.Getenv(key); val != "" {
-		return val
+func getEnv(keys interface{}, fallback string) string {
+	switch v := keys.(type) {
+	case string:
+		if val := os.Getenv(v); val != "" {
+			return val
+		}
+	case []string:
+		for _, key := range v {
+			if val := os.Getenv(key); val != "" {
+				return val
+			}
+		}
 	}
 	return fallback
 }

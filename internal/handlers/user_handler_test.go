@@ -55,7 +55,7 @@ func setupRouter(handler *UserHandler) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
 	api := r.Group("/api/v1")
-	handler.RegisterRoutes(api)
+	handler.RegisterRoutes(api, UserRoutePermissions{})
 	return r
 }
 

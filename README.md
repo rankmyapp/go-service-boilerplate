@@ -93,6 +93,8 @@ O `.env` esta no `.gitignore` para nao expor credenciais. Sempre commite apenas 
 
 ## Endpoints da API
 
+Quando `AUTH_ENABLED=true`, todos os endpoints em `/api/v1` exigem JWT e podem retornar **401** se token/permissoes forem invalidos.
+
 | Metodo   | Rota                  | Descricao         |
 |----------|-----------------------|--------------------|
 | `POST`   | `/api/v1/users`       | Criar usuario      |
