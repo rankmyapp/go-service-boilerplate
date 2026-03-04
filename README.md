@@ -11,6 +11,8 @@ Base para APIs em Go usando **Gin**, **Clean Architecture**, **MongoDB** e **Swa
 - Suporte a multiplos bancos de dados via ConnectionManager
 - Swagger (OpenAPI) gerado automaticamente a partir de anotacoes
 - Configuracao via `.env` (variaveis de ambiente)
+- CORS configuravel por ambiente
+- Logging estruturado (slog)
 - Testes unitarios com mocks (testify)
 - Testes de integracao com MongoDB real via [Testcontainers](https://github.com/testcontainers/testcontainers-go)
 - Containerizacao com Docker e Docker Compose
@@ -40,7 +42,7 @@ git clone https://github.com/user/gin-microservice-boilerplate.git
 cd gin-microservice-boilerplate
 
 # 2. Copie o arquivo de configuracao
-cp .env.example .env
+cp .env_example .env
 
 # 3. Suba um MongoDB local (ou ajuste a URI no .env)
 docker run -d -p 27017:27017 mongo:7
@@ -67,55 +69,25 @@ O Docker Compose cuida de tudo: builda a imagem da API, sobe o MongoDB com healt
 
 ## Configuracao
 
-A aplicacao usa variaveis de ambiente carregadas via `.env`. O arquivo `.env.example` serve como referencia:
+A aplicacao usa variaveis de ambiente carregadas via `.env`. O arquivo `.env_example` serve como referencia:
 
-| Variavel              | Default                       | Descricao            |
-|-----------------------|-------------------------------|----------------------|
-| `SERVER_PORT`         | `8080`                        | Porta do servidor    |
-| `DB_PRIMARY_KIND`     | `mongodb`                     | Tipo do banco        |
-| `DB_PRIMARY_URI`      | `mongodb://localhost:27017`   | URI de conexao       |
-| `DB_PRIMARY_DATABASE` | `appdb`                       | Nome do database     |
+| Variavel                | Default                       | Descricao                               |
+|-------------------------|-------------------------------|-----------------------------------------|
+| `SERVER_PORT`           | `8080`                        | Porta do servidor                       |
+| `CORS_ALLOWED_ORIGINS`  | vazio                         | Lista de origens separadas por virgula  |
+| `LOG_LEVEL`             | `info`                        | Nivel de log (`debug|info|warn|error`)  |
+| `LOG_FORMAT`            | `json`                        | Formato (`json|text`)                   |
+| `LOG_ADD_SOURCE`        | `false`                       | Inclui arquivo/linha no log             |
+| `AUTH_ENABLED`          | `false`                       | Habilita validacao JWT                  |
+| `AUTH_JWT_SECRET`       | vazio                         | Segredo JWT (obrigatorio se enabled)    |
+| `AUTH_JWT_ISSUER`       | vazio                         | Issuer JWT                              |
+| `AUTH_JWT_AUDIENCE`     | vazio                         | Audience JWT                            |
+| `DB_CONNECTIONS`        | `primary`                     | Nomes das conexoes (CSV)                |
+| `DB_PRIMARY_KIND`       | `mongodb`                     | Tipo do banco                            |
+| `DB_PRIMARY_URI`        | `mongodb://localhost:27017`   | URI de conexao                           |
+| `DB_PRIMARY_DATABASE`   | `appdb`                       | Nome do database                         |
 
-### Auth & Permissoes (JWT)
-
-O template suporta autenticacao via JWT (HS256) e autorizacao por IDs numericos no claim `permissions`.
-
-- `AUTH_ENABLED=false` (default): endpoints em `/api/v1` ficam publicos.
-- `AUTH_ENABLED=true`: endpoints em `/api/v1` exigem token via `Authorization: Bearer <token>` (e opcionalmente via cookie HttpOnly).
-
-| Variavel                         | Default                          | Descricao |
-|----------------------------------|----------------------------------|-----------|
-| `AUTH_ENABLED`                   | `false`                          | Ativa/desativa autenticacao/autorizacao |
-| `JWT_SECRET`                     | -                                | Secret HS256 (obrigatorio quando `AUTH_ENABLED=true`) |
-| `API_SECRET`                     | -                                | Alternativa ao `JWT_SECRET` |
-| `AUTH_TOKEN_COOKIE_NAME`         | `authService_production_token`   | Nome do cookie HttpOnly (use vazio para desabilitar) |
-| `AUTH_REQUIRED_PERMISSIONS`      | vazio                            | Fallback global (CSV de IDs) |
-| `AUTH_PERMISSIONS_USERS_CREATE`  | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
-| `AUTH_PERMISSIONS_USERS_LIST`    | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
-| `AUTH_PERMISSIONS_USERS_GET`     | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
-| `AUTH_PERMISSIONS_USERS_UPDATE`  | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
-| `AUTH_PERMISSIONS_USERS_DELETE`  | `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
-| `AUTH_PERMISSIONS_EXPORTS_CREATE`| `AUTH_REQUIRED_PERMISSIONS`      | Override por endpoint (CSV) |
-
-Se a env especifica estiver vazia, sera usado `AUTH_REQUIRED_PERMISSIONS`.
-
-Exemplo:
-
-```env
-AUTH_ENABLED=true
-JWT_SECRET=ranksecret
-AUTH_REQUIRED_PERMISSIONS=339
-AUTH_PERMISSIONS_USERS_CREATE=339
-AUTH_PERMISSIONS_EXPORTS_CREATE=339
-```
-
-Requisicao:
-
-```bash
-curl -H "Authorization: Bearer <token>" http://localhost:8080/api/v1/users
-```
-
-O `.env` esta no `.gitignore` para nao expor credenciais. Sempre commite apenas o `.env.example`.
+O `.env` esta no `.gitignore` para nao expor credenciais. Sempre commite apenas o `.env_example`.
 
 ---
 
@@ -181,7 +153,7 @@ Quando `AUTH_ENABLED=true`, todos os endpoints em `/api/v1` exigem JWT e podem r
 │   │       └── provider.go            # Provider MongoDB
 │   └── web/
 │       └── server.go                  # Setup do Gin + Swagger
-├── .env.example                       # Exemplo de variaveis de ambiente
+├── .env_example                       # Exemplo de variaveis de ambiente
 ├── .gitignore
 ├── .dockerignore
 ├── Dockerfile                         # Multi-stage build
@@ -290,7 +262,7 @@ Get-ChildItem -Recurse -Filter *.go | ForEach-Object { (Get-Content $_.FullName)
 ### 2. Configure o `.env`
 
 ```bash
-cp .env.example .env
+cp .env_example .env
 # edite o .env com suas credenciais
 ```
 
@@ -488,6 +460,8 @@ mgr.RegisterProvider("postgres", dbPostgres.Registration())
 #### 3. Adicionar ao .env
 
 ```env
+DB_CONNECTIONS=primary,analytics
+
 DB_ANALYTICS_KIND=postgres
 DB_ANALYTICS_URI=postgres://user:pass@localhost:5432/analytics?sslmode=disable
 DB_ANALYTICS_DATABASE=analytics
@@ -495,7 +469,7 @@ DB_ANALYTICS_DATABASE=analytics
 
 #### 4. Adicionar ao config.go
 
-Inclua a nova instancia no mapa `Databases` dentro de `config.Load()`.
+Nao e necessario alterar `config.go`. O boilerplate usa `DB_CONNECTIONS` para carregar qualquer conexao definida.
 
 ---
 
@@ -505,8 +479,7 @@ Middlewares sao adicionados no `pkg/web/server.go` ou diretamente em `main.go`:
 
 ```go
 // pkg/web/server.go - middleware global
-r := gin.Default()
-r.Use(corsMiddleware())
+// O CORS ja vem configurado via env em pkg/web/server.go.
 
 // cmd/api/main.go - middleware por grupo
 api := router.Group("/api/v1")
