@@ -17,7 +17,10 @@ Leia antes de iniciar qualquer tarefa:
 - /ai/context/architecture.md
 - /ai/context/domains.md
 - /ai/context/tech-stack.md
+- /ai/state/STATE.template.md
 ```
+
+Se a tarefa for longa, copie `/ai/state/STATE.template.md` para `/ai/state/STATE.md` e mantenha o estado atualizado durante o fluxo.
 
 ### 2. Carregar Padrões Downstream
 ```
@@ -50,6 +53,12 @@ Entregar ao humano:
 
 **Aguardar aprovação humana antes de continuar.**
 
+Após aprovação, registrar em `/ai/state/STATE.md`:
+- plano aprovado
+- arquivos previstos
+- riscos aceitos
+- dúvidas resolvidas ou pendentes
+
 ### 5. Validar Aderência Técnica
 Antes de implementar, verificar se o plano respeita:
 - [ ] Catálogo de tecnologias (`/ai/standards/allowed-technologies.md`)
@@ -69,6 +78,8 @@ Seguir a ordem Clean Architecture:
 5. Handler
 6. Wiring no `main.go`
 
+Atualizar `/ai/state/STATE.md` após blocos relevantes de alteração, registrando arquivos alterados, decisões tomadas e próximo passo.
+
 ### 7. Escrever Testes
 - Testes unitários do usecase (mock do repository)
 - Testes unitários do handler (mock do usecase)
@@ -79,6 +90,8 @@ Rodar e confirmar:
 make test
 make test-integration  # se aplicável
 ```
+
+Registrar em `/ai/state/STATE.md` os comandos executados e o resultado resumido.
 
 ### 8. Regenerar Swagger
 ```bash
@@ -120,3 +133,4 @@ Descrição do PR deve incluir:
 - [ ] Revisão humana aprovada
 - [ ] Nenhum secret exposto
 - [ ] PR criado com descrição completa
+- [ ] `/ai/state/STATE.md` atualizado com resumo de handoff

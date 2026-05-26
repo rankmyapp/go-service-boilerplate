@@ -16,7 +16,10 @@ Leia antes de iniciar:
 - CLAUDE.md
 - /ai/context/architecture.md
 - /ai/context/domains.md
+- /ai/state/STATE.template.md
 ```
+
+Se a investigação exigir mais de uma rodada, copie `/ai/state/STATE.template.md` para `/ai/state/STATE.md` e registre evidências, hipóteses e próximos passos.
 
 ### 2. Criar Branch
 ```bash
@@ -29,6 +32,7 @@ Convenção: `fix/PROJ-NNN-descricao-curta`
 - Identificar o menor input que reproduz o problema
 - Escrever um teste que **falha** antes da correção (TDD)
 - Confirmar a reprodução com o humano antes de corrigir
+- Registrar a evidência de reprodução em `/ai/state/STATE.md`
 
 ### 4. Identificar a Causa Raiz
 Investigar na camada correta:
@@ -51,6 +55,8 @@ Antes de modificar código, descrever:
 
 **Apresentar para aprovação humana.**
 
+Após aprovação, registrar em `/ai/state/STATE.md` a causa raiz, plano aprovado, arquivos afetados e riscos de regressão.
+
 ### 6. Implementar a Correção
 
 Regras:
@@ -64,6 +70,8 @@ make test
 ```
 
 O teste escrito no passo 3 deve passar após a correção.
+
+Registrar em `/ai/state/STATE.md` o teste que falhava, o resultado após a correção e qualquer observação relevante.
 
 ### 8. Verificar Regressões
 ```bash
@@ -112,3 +120,4 @@ Para bugs com impacto em segurança:
 - [ ] Causa raiz documentada no PR
 - [ ] Revisão humana aprovada
 - [ ] Sem logs de debug no código
+- [ ] `/ai/state/STATE.md` atualizado com resumo de handoff
