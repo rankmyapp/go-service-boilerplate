@@ -13,6 +13,16 @@ Leia os arquivos em `/ai/context/` antes de iniciar qualquer tarefa:
 - `/ai/context/domains.md` — entidades de domínio, interfaces e regras de negócio
 - `/ai/context/tech-stack.md` — stack completa, dependências e variáveis de ambiente
 
+## Estado da Tarefa
+
+Para tarefas longas, use `ai/state/STATE.md` como memória operacional da sessão:
+
+1. Copie `ai/state/STATE.template.md` para `ai/state/STATE.md` ao iniciar.
+2. Atualize o estado após plano aprovado, edições relevantes, testes executados, bloqueios e decisões humanas.
+3. Use o estado apenas como continuidade operacional; regras permanentes devem ir para `/ai/context/`, `/ai/rules/`, `/ai/standards/` ou `/ai/workflows/`.
+4. Nunca registre secrets, tokens, credenciais ou dados sensíveis.
+5. Não commite `ai/state/STATE.md`.
+
 ## Regras
 
 Siga todas as diretrizes em `/ai/rules/`:

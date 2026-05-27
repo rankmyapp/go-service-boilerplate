@@ -28,3 +28,6 @@ Thumbs.db
 
 # Config (contains credentials)
 .env
+
+# Estado operacional da IA
+ai/state/STATE.md
